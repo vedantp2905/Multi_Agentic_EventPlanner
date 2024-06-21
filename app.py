@@ -20,7 +20,7 @@ def crawler(api_key,url):
         'onlyMainContent': True
     }
 }
-    return app.crawl_url(crawl_url, params=params, wait_until_done=True, timeout=5)
+    return app.crawl_url(crawl_url, params=params, wait_until_done=True)
        
 def generate_text(llm, question, crawl_result):
 
