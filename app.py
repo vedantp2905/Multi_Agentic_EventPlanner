@@ -97,7 +97,7 @@ if api_key:
         mod = 'Gemini'
     
     
-    app = FirecrawlApp(api_key=api_key)
+    app = FirecrawlApp(api_key=firecrawl_api)
     crawl_url = url
     params = {
     'pageOptions': {
