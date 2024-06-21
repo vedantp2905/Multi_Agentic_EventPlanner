@@ -166,7 +166,7 @@ def main():
        with st.form('Gemini/OpenAI/Groq'):
             # User selects the model (Gemini/Cohere) and enters API keys
             model = st.radio('Choose Your LLM', ('Gemini', 'OpenAI','Groq'))
-            type= st.radio("Choose Your Groq Model,"('gemma-7b-it','llama3-70b-8192','llama3-8b-8192','mixtral-8x7b-32768'))
+            model_type = st.radio("Choose Your Groq Model if Groq selected,"('gemma-7b-it','llama3-70b-8192','llama3-8b-8192','mixtral-8x7b-32768'))
             api_key = st.text_input(f'Enter your API key', type="password")
             replicate_api_token = st.text_input('Enter Replicate API key', type="password")
             submitted = st.form_submit_button("Submit")
@@ -214,7 +214,7 @@ def main():
 
                 llm = ChatGroq(
                     api_key = api_key,
-                    model = type
+                    model = model_type
                 )
                 return llm
 
