@@ -96,21 +96,21 @@ if api_key:
         llm = asyncio.run(setup_gemini())
         mod = 'Gemini'
     
-    
-    app = FirecrawlApp(api_key=firecrawl_api)
-    crawl_url = url
-    params = {
-    'pageOptions': {
-        'onlyMainContent': True
-    }
-    }
-    crawled_data =  app.crawl_url(crawl_url, params=params, wait_until_done=True)
-    data = crawled_data 
     question = st.text_input("Enter your question:")
 
     if st.button("Generate Answer"):
 
         with st.spinner("Generating Answer..."):
-        
-            generated_content = generate_text(llm, question,data)
-            st.markdown(generated_content)
+            
+             
+           app = FirecrawlApp(api_key=firecrawl_api)
+           crawl_url = url
+           params = {
+    'pageOptions': {
+        'onlyMainContent': True
+    }
+    }
+           crawled_data =  app.crawl_url(crawl_url, params=params, wait_until_done=True)
+   
+           generated_content = generate_text(llm, question,crawled_data)
+           st.markdown(generated_content)
