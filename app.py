@@ -83,7 +83,7 @@ def generate_text(llm, topic):
         agent=blog_writer,
         expected_output=(
             "1. Engaging introduction with a hook.\n"
-            "2. Detailed exploration of key developments.\n"
+            "2. Use of deatiled exploration of key developments.\n"
             "3. Use of emerging trends and innovative ideas in content.\n"
             "4. Use of unique angles and perspectives in content.\n"
             "5. Clear explanations of complex concepts.\n"
@@ -101,8 +101,7 @@ def generate_text(llm, topic):
             "3. Suggestions for improving flow and readability.\n"
             "4. Recommendations for tone and voice.\n"
             "5. Edits for grammar and punctuation.\n"
-            "6. Feedback on multimedia use.\n"
-            "7. Final assessment of readiness."
+            "6. Final assessment of readiness."
         )
     )
 
@@ -136,39 +135,132 @@ def generate_text(llm, topic):
     return result
 
 
+# Function to generate images based on prompts
+def generate_images(replicate_api_token, prompt):
+    
+    os.environ["REPLICATE_API_TOKEN"] = replicate_api_token
+
+    # Define the input for the image generation
+    input = {
+        "prompt": prompt,
+        "scheduler": "K_EULER"
+    }
+
+    # Generate the image
+    output = replicate.run(
+        "stability-ai/stable-diffusion:ac732df83cea7fff18b8472768c88ad041fa750ff7682a21affe81863cbe77e4",
+        input=input
+    )
+
+    # Assuming output is a list of URLs, return the first one
+    if output and isinstance(output, list) and len(output) > 0:
+        return output[0]
+    else:
+        raise ValueError("No image URL returned from Replicate API.")
+
 # Streamlit web application
 def main():
    st.header('AI Blog Content Generator')
    mod = None
    with st.sidebar:
-       with st.form('Groq'):
+       with st.form('Gemini/OpenAI/Groq'):
             # User selects the model (Gemini/Cohere) and enters API keys
+            model = st.radio('Choose Your LLM', ('Gemini', 'OpenAI','Groq'))
+            if model == 'Groq':
+                type= st.radio("Choose Your Groq Model,"('gemma-7b-it','llama3-70b-8192','llama3-8b-8192','mixtral-8x7b-32768'))
             api_key = st.text_input(f'Enter your API key', type="password")
+            replicate_api_token = st.text_input('Enter Replicate API key', type="password")
             submitted = st.form_submit_button("Submit")
 
-    
-    
    # Check if API key is provided and set up the language model accordingly
    if api_key:
+        if model == 'OpenAI':
+            async def setup_OpenAI():
+                loop = asyncio.get_event_loop()
+                if loop is None:
+                    loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
+
+                os.environ["OPENAI_API_KEY"] = api_key
+                llm = OpenAI(temperature=0.6,max_tokens=2000)
+                return llm
+
+            llm = asyncio.run(setup_OpenAI())
+            mod = 'OpenAI'
+
+        elif model == 'Gemini':
+            async def setup_gemini():
+                loop = asyncio.get_event_loop()
+                if loop is None:
+                    loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
+
+                llm = ChatGoogleGenerativeAI(
+                    model="gemini-1.5-flash",
+                    verbose=True,
+                    temperature=0.6,
+                    google_api_key=api_key  # Use the API key from the environment variable
+                )
+                return llm
+
+            llm = asyncio.run(setup_gemini())
+            mod = 'Gemini'
         
-        llm = ChatGroq(
-            api_key='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',
-            model = 'llama3-70b-8192'
-        )
-        
+        elif model == 'Groq':
+            async def setup_groq():
+                loop = asyncio.get_event_loop()
+                if loop is None:
+                    loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
+
+                llm = ChatGroq(
+                    api_key = api_key
+                    model = type
+                )
+                return llm
+
+            llm = asyncio.run(setup_groq())
+            mod = 'Groq'
+            
+            
         # User input for the blog topic
         topic = st.text_input("Enter the blog topic:")
 
         if st.button("Generate Blog Content"):
             with st.spinner("Generating content..."):
                 generated_content = generate_text(llm, topic)
+                generated_image_url = generate_images(replicate_api_token, topic)
 
                 content_lines = generated_content.split('\n')
                 first_line = content_lines[0]
                 remaining_content = '\n'.join(content_lines[1:])
 
                 st.markdown(first_line)
+                st.image(generated_image_url, caption="Generated Image", use_column_width=True)
                 st.markdown(remaining_content)
+
+                # Download the images and add them to the document
+                response = requests.get(generated_image_url)
+                image = BytesIO(response.content)
+
+                doc = Document()
+
+                # Option to download content as a Word document
+                doc.add_heading(topic, 0)
+                doc.add_paragraph(first_line)
+                doc.add_picture(image, width=docx.shared.Inches(6))  # Add image to the document
+                doc.add_paragraph(remaining_content)
+
+                buffer = BytesIO()
+                doc.save(buffer)
+                buffer.seek(0)
+
+                st.download_button(
+                    label="Download as Word Document",
+                    data=buffer,
+                    file_name=f"{topic}.docx",
+                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                )
 
 if __name__ == "__main__":
     main()
