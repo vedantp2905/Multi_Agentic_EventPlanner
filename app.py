@@ -105,7 +105,7 @@ if api_key:
     }
     }
     crawled_data =  app.crawl_url(crawl_url, params=params, wait_until_done=True)
-       
+    st.write(crawled_data) 
     question = st.text_input("Enter your question:")
 
     if st.button("Generate Answer"):
