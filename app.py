@@ -6,17 +6,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from crewai import Agent, Task, Crew
 from firecrawl import FirecrawlApp
 
-def crawler(api_key,url):
-    
-    app = FirecrawlApp(api_key=api_key)
-    crawl_url = url
-    params = {
-    'pageOptions': {
-        'onlyMainContent': True
-    }
-}
-    return app.crawl_url(crawl_url, params=params, wait_until_done=True)
-       
+
 def generate_text(llm, question, crawl_result):
 
     inputs = {'question': question}
@@ -106,7 +96,16 @@ if api_key:
         llm = asyncio.run(setup_gemini())
         mod = 'Gemini'
     
-    crawled_data = crawler(firecrawl_api,url)
+    
+    app = FirecrawlApp(api_key=api_key)
+    crawl_url = url
+    params = {
+    'pageOptions': {
+        'onlyMainContent': True
+    }
+    }
+    crawled_data =  app.crawl_url(crawl_url, params=params, wait_until_done=True)
+       
     question = st.text_input("Enter your question:")
 
     if st.button("Generate Answer"):
