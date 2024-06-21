@@ -169,11 +169,11 @@ def main():
             submitted = st.form_submit_button()
             
        if model == 'Groq':
-            with st.form('Choose Groq Model',key='Groq Models'):
+            with st.form('Choose Groq Model'):
                 model_type = st.radio("Choose Your Groq Model if Groq selected",('gemma-7b-it','llama3-70b-8192','llama3-8b-8192','mixtral-8x7b-32768'))
                 submitted = st.form_submit_button()
          
-       with st.form('Gemini/OpenAI/Groq',key = 'Api keys'):
+       with st.form('Gemini/OpenAI/Groq'):
            api_key = st.text_input(f'Enter your API key', type="password")
            replicate_api_token = st.text_input('Enter Replicate API key', type="password")
            submitted = st.form_submit_button()
