@@ -95,7 +95,7 @@ if api_key:
         llm = asyncio.run(setup_gemini())
         mod = 'Gemini'
     
-    url = st.text_input(f'Enter your url', type="default")
+    url = st.text_input('Enter your url')
     
     app = FirecrawlApp(api_key=firecrawl_api)
     crawl_url = url
