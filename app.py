@@ -214,7 +214,7 @@ def main():
                     asyncio.set_event_loop(loop)
 
                 llm = ChatGroq(
-                    api_key = api_key
+                    api_key = api_key,
                     model = type
                 )
                 return llm
