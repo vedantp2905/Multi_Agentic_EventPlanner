@@ -153,7 +153,7 @@ def main():
         
         llm = ChatGroq(
             api_key='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',
-            model = 'mixtral-8x7b-32768'
+            model = 'llama3-70b-8192'
         )
         
         # User input for the blog topic
