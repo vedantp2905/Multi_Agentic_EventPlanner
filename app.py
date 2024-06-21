@@ -1,5 +1,6 @@
 import os
 import asyncio
+import time
 import streamlit as st
 from langchain_openai import ChatOpenAI
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -8,7 +9,7 @@ from firecrawl import FirecrawlApp
 from requests.exceptions import HTTPError
 
 def generate_text(llm, question, crawl_result):
-    inputs = {'question': question}
+    inputs = {'question': question, 'crawl_result': crawl_result}
     writer_agent = Agent(
         role='Customer Service Specialist',
         goal='To accurately and efficiently answer customer questions',
@@ -24,14 +25,16 @@ def generate_text(llm, question, crawl_result):
     )
 
     task_writer = Task(
-        description=(f'''Use the crawled data to accurately and efficiently answer customer question. 
-                         The crawled data is: {crawl_result}
-                         The customer question is: {question}
-                         The task involves analyzing user queries and generating clear, concise, and accurate responses.'''),
+        description=(
+            '''Use the crawled data to accurately and efficiently answer customer questions. 
+            The crawled data is: {crawl_result}
+            The customer question is: {question}
+            The task involves analyzing user queries and generating clear, concise, and accurate responses.'''
+        ),
         agent=writer_agent,
         expected_output="""
         - A detailed and well-sourced answer to the customer's question.
-        - No extra information. Just answer to the question.
+        - No extra information. Just answer the question.
         - Clear and concise synthesis of the retrieved information, formatted in a user-friendly manner.
         """
     )
@@ -40,7 +43,7 @@ def generate_text(llm, question, crawl_result):
         agents=[writer_agent],
         tasks=[task_writer],
         verbose=2,
-        context={"Customer Question is ": question}
+        context={"Customer Question is": question}
     )
 
     result = crew.kickoff(inputs=inputs)
