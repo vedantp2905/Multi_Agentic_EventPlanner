@@ -11,11 +11,6 @@ def crawler(api_key,url):
     app = FirecrawlApp(api_key=api_key)
     crawl_url = url
     params = {
-    'crawlerOptions': {
-        'excludes': ['blog/*'],
-        'includes': [], # leave empty for all pages
-        'limit': 1000,
-    },
     'pageOptions': {
         'onlyMainContent': True
     }
