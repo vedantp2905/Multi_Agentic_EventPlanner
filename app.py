@@ -55,7 +55,6 @@ with st.sidebar:
         model = st.radio('Choose Your LLM', ['Gemini','OpenAI'])
         api_key = st.text_input(f'Enter your API key', type="password")
         firecrawl_api = st.text_input(f'Enter your FireCrawl API key', type="password")
-        url = st.text_input(f'Enter your url', type="default")
         submitted = st.form_submit_button("Submit")
 
 if api_key:
@@ -96,21 +95,22 @@ if api_key:
         llm = asyncio.run(setup_gemini())
         mod = 'Gemini'
     
+    url = st.text_input(f'Enter your url', type="default")
+    
+    app = FirecrawlApp(api_key=firecrawl_api)
+    crawl_url = url
+    params = {
+    'pageOptions': {
+        'onlyMainContent': True
+    }
+    }
+    crawled_data =  app.crawl_url(crawl_url, params=params, wait_until_done=True)
+    
     question = st.text_input("Enter your question:")
 
     if st.button("Generate Answer"):
 
         with st.spinner("Generating Answer..."):
-            
-             
-           app = FirecrawlApp(api_key=firecrawl_api)
-           crawl_url = url
-           params = {
-    'pageOptions': {
-        'onlyMainContent': True
-    }
-    }
-           crawled_data =  app.crawl_url(crawl_url, params=params, wait_until_done=True)
-   
+        
            generated_content = generate_text(llm, question,crawled_data)
            st.markdown(generated_content)
