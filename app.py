@@ -135,28 +135,6 @@ def generate_text(llm, topic):
 
     return result
 
-# Function to generate images based on prompts
-def generate_images(replicate_api_token, prompt):
-    
-    os.environ["REPLICATE_API_TOKEN"] = replicate_api_token
-
-    # Define the input for the image generation
-    input = {
-        "prompt": prompt,
-        "scheduler": "K_EULER"
-    }
-
-    # Generate the image
-    output = replicate.run(
-        "stability-ai/stable-diffusion:ac732df83cea7fff18b8472768c88ad041fa750ff7682a21affe81863cbe77e4",
-        input=input
-    )
-
-    # Assuming output is a list of URLs, return the first one
-    if output and isinstance(output, list) and len(output) > 0:
-        return output[0]
-    else:
-        raise ValueError("No image URL returned from Replicate API.")
 
 # Streamlit web application
 def main():
@@ -166,7 +144,6 @@ def main():
        with st.form('Groq'):
             # User selects the model (Gemini/Cohere) and enters API keys
             api_key = st.text_input(f'Enter your API key', type="password")
-            replicate_api_token = st.text_input('Enter Replicate API key', type="password")
             submitted = st.form_submit_button("Submit")
 
     
@@ -185,38 +162,13 @@ def main():
         if st.button("Generate Blog Content"):
             with st.spinner("Generating content..."):
                 generated_content = generate_text(llm, topic)
-                generated_image_url = generate_images(replicate_api_token, topic)
 
                 content_lines = generated_content.split('\n')
                 first_line = content_lines[0]
                 remaining_content = '\n'.join(content_lines[1:])
 
                 st.markdown(first_line)
-                st.image(generated_image_url, caption="Generated Image", use_column_width=True)
                 st.markdown(remaining_content)
-
-                # Download the images and add them to the document
-                response = requests.get(generated_image_url)
-                image = BytesIO(response.content)
-
-                doc = Document()
-
-                # Option to download content as a Word document
-                doc.add_heading(topic, 0)
-                doc.add_paragraph(first_line)
-                doc.add_picture(image, width=docx.shared.Inches(6))  # Add image to the document
-                doc.add_paragraph(remaining_content)
-
-                buffer = BytesIO()
-                doc.save(buffer)
-                buffer.seek(0)
-
-                st.download_button(
-                    label="Download as Word Document",
-                    data=buffer,
-                    file_name=f"{topic}.docx",
-                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                )
 
 if __name__ == "__main__":
     main()
