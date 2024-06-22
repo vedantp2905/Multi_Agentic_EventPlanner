@@ -8,20 +8,23 @@ from firecrawl import FirecrawlApp
 from fpdf import FPDF
 
 
+import json
+
 def create_pdf(url, data):
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=12)
     
-    # Convert data (which is a list) to a string
-    data_str = "\n".join(data) if isinstance(data, list) else str(data)
+    # Convert data (which is a dictionary or a list of dictionaries) to a JSON string
+    data_str = json.dumps(data, indent=4)
     
-    pdf.cell(200, 10, txt=data_str, ln=True)
+    pdf.multi_cell(0, 10, txt=data_str)
     
     # Use the url parameter for the filename (replace special characters)
     filename = "".join(c for c in url if c.isalnum() or c in ['-', '_']) + ".pdf"
     
     pdf.output(filename)
+
 
 def generate_text(llm, question, crawl_result):
 
