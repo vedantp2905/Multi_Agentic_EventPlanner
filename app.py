@@ -20,9 +20,8 @@ def create_pdf(url, data):
     
     pdf.multi_cell(0, 10, txt=data_str)
     
-    # Use the url parameter for the filename (replace special characters)
-    filename = "".join(c for c in url if c.isalnum() or c in ['-', '_']) + ".pdf"
-    
+    os.makedirs("Saved Files", exist_ok=True)
+    filename = os.path.join("Saved Files", url+".pdf")
     pdf.output(filename)
 
 
