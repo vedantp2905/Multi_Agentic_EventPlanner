@@ -21,8 +21,8 @@ def create_pdf(url, data):
     pdf.multi_cell(0, 10, txt=data_str)
     
     os.makedirs("Saved Files", exist_ok=True)
-    filename = os.path.join("Saved Files", url+".pdf")
-    pdf.output(filename)
+
+    pdf.output("Saved Files")
 
 
 def generate_text(llm, question, crawl_result):
