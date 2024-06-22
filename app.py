@@ -10,7 +10,6 @@ from fpdf import FPDF
 
 def create_pdf(url,data):
     pdf = FPDF()
-    pdf.title(url)
     pdf.add_page()
     pdf.set_font("Arial", size=12)
     pdf.cell(200, 10, txt=data, ln=True)
