@@ -64,6 +64,7 @@ with st.sidebar:
         model = st.radio('Choose Your LLM', ['Gemini','OpenAI'])
         api_key = st.text_input(f'Enter your API key', type="password")
         firecrawl_api = st.text_input(f'Enter your FireCrawl API key', type="password")
+        url = st.text_input('Enter your url')
         submitted = st.form_submit_button("Submit")
 
 if api_key:
@@ -104,7 +105,6 @@ if api_key:
         llm = asyncio.run(setup_gemini())
         mod = 'Gemini'
     
-    url = st.text_input('Enter your url')
     
     app = FirecrawlApp(api_key=firecrawl_api)
     crawl_url = url
