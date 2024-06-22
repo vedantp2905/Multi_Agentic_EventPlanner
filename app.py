@@ -8,12 +8,20 @@ from firecrawl import FirecrawlApp
 from fpdf import FPDF
 
 
-def create_pdf(url,data):
+def create_pdf(url, data):
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=12)
-    pdf.cell(200, 10, txt=data, ln=True)
-    pdf.output("Saved Files")
+    
+    # Convert data (which is a list) to a string
+    data_str = "\n".join(data) if isinstance(data, list) else str(data)
+    
+    pdf.cell(200, 10, txt=data_str, ln=True)
+    
+    # Use the url parameter for the filename (replace special characters)
+    filename = "".join(c for c in url if c.isalnum() or c in ['-', '_']) + ".pdf"
+    
+    pdf.output(filename)
 
 def generate_text(llm, question, crawl_result):
 
