@@ -1,10 +1,9 @@
-streamlit
+streamlit==1.36.00
 python-docx
-crewai
-langchain-google-genai
-openai
-langchain-core
+crewai==0.30.11
+langchain-google-genai==1.0.4
+replicate==0.26.0
+openai==1.31.0
+langchain-core==0.1.52
 pysqlite3-binary
-crewai-tools
-firecrawl-py
-FPDF
+langchain-groq==0.1.5
