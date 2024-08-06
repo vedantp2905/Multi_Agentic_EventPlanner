@@ -166,9 +166,8 @@ def generate_event_plan(llm, serper_dev_key,event_type, budget, num_people, cuis
        - Security personnel requirements
     6. Signage and wayfinding plan
     7. Contingency plans for weather (if applicable) or other potential issues
-    8. Sustainability considerations (waste management, eco-friendly options)
     9. Any necessary permits or licenses required for the event
-    10. Estimated costs for each aspect of the logistics plan
+    10. Totoal costs for logistics plan
     Use the web search tool and web scraper to find reputable local transportation, equipment rental, and staffing services in {location}. Contact service providers directly if possible to get accurate quotes and confirm availability.""",
     agent=logistics_coordinator,
     expected_output="A comprehensive logistics plan covering all requested aspects, with specific details, service provider recommendations, and accurate cost estimates.",
@@ -209,7 +208,7 @@ def generate_event_plan(llm, serper_dev_key,event_type, budget, num_people, cuis
         verbose=2,
         manager_agent=Agent(
             role='Event Planning Manager',
-            goal=f'Oversee and coordinate the entire event planning process for the {event_type} in {location} on {date} for {num_people} people, ensuring all aspects are within the total budget of {budget} in the local currency of {location}. Please utilize the entire budget and not be cheap',
+            goal=f'Oversee and coordinate the entire event planning process for the {event_type} in {location} on {date} for {num_people} people, ensuring all aspects are within the total budget of {budget}. Please utilize the entire budget and not be cheap',
             backstory="An experienced event planner with a keen eye for detail and excellent organizational skills. You have extensive knowledge of event planning in various locations and can make informed decisions to create a cohesive and successful event.",
             verbose=True,
             allow_delegation=True,
@@ -221,7 +220,7 @@ def generate_event_plan(llm, serper_dev_key,event_type, budget, num_people, cuis
 
     result = crew.kickoff()
     
-    return result
+    return event_presentation.output.raw_output
 
 def main():
     st.header('AI Event Planner')
@@ -299,7 +298,7 @@ def main():
                 llm = ChatGroq(
                     api_key=api_key,
                     model='llama-3.1-70b-versatile',
-                    max_tokens=5000,
+                    max_tokens=8000,
                     temperature=0.6
                 )
                 return llm
@@ -309,6 +308,9 @@ def main():
         event = st.text_input("Enter your event type (Example - Conference for AI)")
         location = st.text_input("Enter location where event needs to be planned. Eg- Pune,India")
         budget = st.number_input("Enter your budget", min_value=0, step=2000)
+        currency = st.text_input("Enter your currency. Eg- USD")
+        budget = currency + ' '+str(budget)
+        print(budget)
         num_people = st.number_input("Enter total number of people", min_value=1, step=1)
         cuisine = st.text_input("Enter food cuisine needed")
         date = st.date_input("Select event date", datetime.now().date())
@@ -316,6 +318,7 @@ def main():
         if st.button("Generate Event Plan"):
             with st.spinner("Generating event plan..."):
                 st.session_state.generated_content = generate_event_plan(llm, serper_dev_key,event, budget, num_people, cuisine, date, location)
+                print("Chain finsihed")
 
         if st.session_state.generated_content:
             st.markdown(st.session_state.generated_content)
